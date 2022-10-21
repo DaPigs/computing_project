@@ -1,0 +1,17 @@
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+  fetch("/header.html")
+      .then((res) => res.text())
+      .then((html) => {
+        document.body.insertAdjacentHTML("afterbegin", html);
+        navbarInit();
+      });
+});
+</script>
+<body></body>
+<table border="1">
+  <tr>
+    <th>Room name</th>
+    <th>Room description</th>
+    <th>Enter room</th>
+  </tr>
