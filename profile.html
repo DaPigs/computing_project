@@ -12,11 +12,11 @@ window.addEventListener("DOMContentLoaded", () => {
 <form action="../update_profile/" method="post">
 Username: <input size="5" type="text" value="{{user.username}}" name="username" required>
 <br>
-Old Password: <input size="5" type="text" name="old-pw">
+Old Password: <input size="5" type="password" name="old-pw">
 <br>
-New Password: <input size="5" type="text" name="new-pw">
+New Password: <input size="5" type="password" name="new-pw">
 <br>
-Confirmation of New Password: <input size="5" type="text" name="confirm-pw">
+Confirmation of New Password: <input size="5" type="password" name="confirm-pw">
 <br>
 Profile Pic URL: <input size="10" type="text" value="{{user.pic}}" name="pic" required>
 <br>
