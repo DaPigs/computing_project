@@ -1,0 +1,36 @@
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+  fetch("/header.html")
+      .then((res) => res.text())
+      .then((html) => {
+        document.body.insertAdjacentHTML("afterbegin", html);
+        navbarInit();
+      });
+});
+</script>
+<body>
+<form action="../rooms">
+    <input type="submit" value="Back" />
+</form>
+<form action="../leaderboard/{{room.id}}">
+    <input type="submit" value="Leaderboard" />
+</form>
+<form action="../manage/{{room.id}}">
+    <input type="submit" value="Settings" />
+</form>
+Room Owner: {{owner.nickname}}
+<br>
+Room ID: {{room.id}}
+</body>
+<table border="1">
+    <tr>
+        <td>Username</td>
+        <td>Nickname</td>
+        <td>Points</td>
+    </tr>
+    <tr>
+        <td>{{user.username}}</td>
+        <td>{{room_user.nickname}}</td>
+        <td>{{point.point}}</td>
+    </tr>
+</table>

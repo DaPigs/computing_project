@@ -1,0 +1,24 @@
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+  fetch("/header.html")
+      .then((res) => res.text())
+      .then((html) => {
+        document.body.insertAdjacentHTML("afterbegin", html);
+        navbarInit();
+      });
+});
+</script>
+
+<form action="../update_profile/" method="post">
+Username: <input size="5" type="text" value="{{user.username}}" name="username" required>
+<br>
+Old Password: <input size="5" type="text" name="old-pw">
+<br>
+New Password: <input size="5" type="text" name="new-pw">
+<br>
+Confirmation of New Password: <input size="5" type="text" name="confirm-pw">
+<br>
+Profile Pic URL: <input size="10" type="text" value="{{user.pic}}" name="pic" required>
+<br>
+<button type="submit">Update</button>
+</form>

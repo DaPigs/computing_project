@@ -24,7 +24,7 @@ class Room:
 
 class Room_User:
     def __init__(self, *args):
-        self.id, self.room_id = args
+        self.id, self.room_id, self.user_id, self.nickname = args
         self.args = args
 
     def __str__(self):

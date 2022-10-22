@@ -1,0 +1,82 @@
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+  fetch("/header.html")
+      .then((res) => res.text())
+      .then((html) => {
+        document.body.insertAdjacentHTML("afterbegin", html);
+        navbarInit();
+      });
+});
+</script>
+<body>
+<form action="../rooms">
+    <input type="submit" value="Back" />
+</form>
+<form action="../leaderboard/{{room.id}}">
+    <input type="submit" value="Leaderboard" />
+</form>
+<form action="../manage/{{room.id}}">
+    <input type="submit" value="Settings" />
+</form>
+Room Owner: {{owner.nickname}}
+<br>
+Room ID: {{room.id}}
+<br><br>
+Permission levels:
+<br>
+Level 5 (Owner): Level 4 + Rights to assign/remove Level 1-4 roles
+<br>
+Level 4: Level 3 + Rights to assign/remove Level 1-3 roles + Rights to change room name/description
+<br>
+Level 3: Level 2 + Rights to assign/remove Level 2 roles
+<br>
+Level 2: Rights to add points
+<br>
+Level 1: Participant (You have no rights)
+<br>
+</body>
+<form action="../update/{{room.id}}" method="post">
+My Nickname: <input size="5" type="text" value="{{user.nickname}}" name="user-name" required>
+<br>
+Room name: <input size="5" type="text" value="{{room.name}}" name="room-name" required>
+<br>
+Room Description: <textarea name="room-description" rows="4" cols="50">{{room.description}}</textarea>
+<br>
+<table border="1">
+    <tr>
+        <td>Nickname</td>
+        <td>Permission Level</td>
+        <td>Current points</td>
+        <td>Add points</td>
+        <td>Transfer Ownership</td>
+    </tr>
+    {% for i in permissions %}
+    <tr>
+        <td>{{i.nickname}}</td>
+        <td>
+            <script>
+              function change_permission{{i.user_id}}(value){
+              ori = parseInt(document.getElementById("permission-{{i.user_id}}").value);
+              document.getElementById("permission-{{i.user_id}}").value = ori + value;}
+           </script>
+            <input type="button" onclick="change_permission{{i.user_id}}(-1)" value="-1">
+            <input size="1" id="permission-{{i.user_id}}" type="text" value="{{i.permission_level}}" name="permission_level-{{i.user_id}}" required>
+            <input type="button" onclick="change_permission{{i.user_id}}(1)" value="+1">
+        </td>
+        <td>{{i.points}}</td>>
+        <td>
+            <script>
+              function change_point{{i.user_id}}(value){
+              ori = parseInt(document.getElementById("points-{{i.user_id}}").value);
+              document.getElementById("points-{{i.user_id}}").value = ori + value;}
+           </script>
+            <input type="button" onclick="change_point{{i.user_id}}(-5)" value="-5">
+            <input size="1" id="points-{{i.user_id}}" type="text" value="0" name="points-{{i.user_id}}" required>
+            <input type="button" onclick="change_point{{i.user_id}}(5)" value="+5">
+        </td>
+        <td><a href="../ownership/{{i.room_id}}/{{i.user_id}}">Transfer ownership</a></td>
+    </tr>
+    {% endfor %}
+</table>
+<button type="submit">Update</button>
+</form>

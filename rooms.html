@@ -8,10 +8,33 @@ window.addEventListener("DOMContentLoaded", () => {
       });
 });
 </script>
-<body></body>
+<body>
+
+<form action="../join" method="post">
+  <div class="container">
+    <label for="room_id"><b>Join room:</b></label>
+    <input type="text" placeholder="Room ID" name="room_id" required>
+    <button type="submit">Join</button>
+  </div>
+</form>
+<form action="../create_room" method="post">
+    <button type="submit">Create Room</button>
+</form>
+
+</body>
 <table border="1">
   <tr>
     <th>Room name</th>
     <th>Room description</th>
     <th>Enter room</th>
   </tr>
+  {% for i in rooms %}
+  <tr>
+    <td>{{i.name}}</td>
+    <td>{{i.description}}</td>
+    <td><form action="../room/{{i.id}}">
+        <input type="submit" value="Enter" />
+    </form></td>
+  </tr>
+  {% endfor %}
+</table>
