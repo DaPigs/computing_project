@@ -1,6 +1,6 @@
-import sqlite3
-from tables import *
 from flask import Flask, request, send_file, redirect, make_response, render_template, url_for
+from tables import *
+import sqlite3
 import os
 
 db = sqlite3.connect("data.db", check_same_thread=False)
@@ -25,12 +25,6 @@ def logged_in():
         return True
     else:
         return False
-
-def text(name):
-    f = open(name, "r", encoding="utf8")
-    S = f.read()
-    f.close()
-    return S
 
 @app.route("/", methods = ['POST', 'GET'])
 def index():
@@ -174,29 +168,6 @@ def update(room):
                     sql(f"INSERT INTO point (id, point) VALUES ({room_user.id}, {value})")
     return redirect(url_for("rooms"))
 
-@app.route("/join", methods = ['POST', 'GET'])
-def join():
-    if(not logged_in()):
-        return redirect(url_for("login"))
-    user = get_user()
-    data = dict(request.form)
-    if("room_id" in data == False):
-        raise SystemError
-
-    cur = sql(f"SELECT * FROM room WHERE id = {data['room_id']}")
-    room = Room(*cur[0])
-
-    sql(f"INSERT INTO [room-user] (room_id, user_id, nickname) VALUES ({room.id}, {user.id}, {user.username})")
-
-    cur = sql(f"SELECT * FROM [room-user] WHERE room_id = {room.id} AND user_id = {user.id}")
-    room_user = Room_User(*cur[0])
-
-    sql(f"INSERT INTO permission (room_id, user_id, permission_level) VALUES ({room.id}, {user.id}, 1)")
-
-    sql(f"INSERT INTO point (id, point) VALUES ({room_user.id}, 0)")
-
-    return redirect(url_for("rooms"))
-
 @app.route("/leaderboard/<room>", methods = ['POST', 'GET'])
 def leaderboard(room):
     if(not logged_in()):
@@ -233,6 +204,29 @@ def create_room():
     room_user = Room_User(*cur[0])
 
     sql(f"INSERT INTO permission (room_id, user_id, permission_level) VALUES ({room.id}, {user.id}, 5)")
+
+    sql(f"INSERT INTO point (id, point) VALUES ({room_user.id}, 0)")
+
+    return redirect(url_for("rooms"))
+
+@app.route("/join", methods = ['POST', 'GET'])
+def join():
+    if(not logged_in()):
+        return redirect(url_for("login"))
+    user = get_user()
+    data = dict(request.form)
+    if("room_id" in data == False):
+        raise SystemError
+
+    cur = sql(f"SELECT * FROM room WHERE id = {data['room_id']}")
+    room = Room(*cur[0])
+
+    sql(f"INSERT INTO [room-user] (room_id, user_id, nickname) VALUES ({room.id}, {user.id}, {user.username})")
+
+    cur = sql(f"SELECT * FROM [room-user] WHERE room_id = {room.id} AND user_id = {user.id}")
+    room_user = Room_User(*cur[0])
+
+    sql(f"INSERT INTO permission (room_id, user_id, permission_level) VALUES ({room.id}, {user.id}, 1)")
 
     sql(f"INSERT INTO point (id, point) VALUES ({room_user.id}, 0)")
 
@@ -307,10 +301,18 @@ def verf():
     else:
         return "Wrong username/password <a href='login'>Go back</a>"
 
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def catch_all(path):
-    return send_file(path)
+@app.route("/header.html", methods = ['POST', 'GET'])
+def header():
+    user = get_user()
+    return render_template("header.html", user=user)
 
-app.secret_key = os.urandom(24)
+@app.errorhandler(Exception)
+def all_exception_handler(error):
+   return send_file("not_found.html")
+
+# @app.route('/', defaults={'path': ''})
+# @app.route('/<path:path>')
+# def catch_all(path):
+#     return send_file(path)
+
 app.run()

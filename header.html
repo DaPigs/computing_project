@@ -1,13 +1,16 @@
-<div class="header">
-  <div style="float:right">
-    <form action="../rooms">
-        <input type="submit" value="Home" />
-    </form>
-    <form action="../profile">
-        <input type="submit" value="Profile" />
-    </form>
-    <form action="../logout">
-        <input type="submit" value="Logout" />
-    </form>
-  </div>
+<div style="float:right">
+    Welcome, {{user.username}}
+    <table>
+        <tr>
+        <td><form action="../rooms">
+            <input type="submit" value="Home" />
+        </form></td>
+        <td><form action="../profile">
+            <input type="submit" value="Profile" />
+        </form></td>
+        <td><form action="../logout">
+            <input type="submit" value="Logout" />
+        </form></td>
+        </tr>
+    </table>
 </div>
