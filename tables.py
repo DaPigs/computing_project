@@ -4,7 +4,9 @@ class Permission:
         self.args = args
 
     def __str__(self):
-        return str(self.args)
+        return f'id:{self.id}\nroom_id:{self.room_id}\nuser_id:{self.user_id}\npermission_level:{self.permission_level}'
+
+    items = ['id,' 'room_id,' 'user_id,' 'permission_level,']
 
 class Point:
     def __init__(self, *args):
@@ -12,7 +14,9 @@ class Point:
         self.args = args
 
     def __str__(self):
-        return str(self.args)
+        return f'id:{self.id}\npoint:{self.point}'
+
+    items = ['id,' 'point,']
 
 class Room:
     def __init__(self, *args):
@@ -20,7 +24,9 @@ class Room:
         self.args = args
 
     def __str__(self):
-        return str(self.args)
+        return f'id:{self.id}\ndescription:{self.description}\nname:{self.name}'
+
+    items = ['id,' 'description,' 'name,']
 
 class Room_User:
     def __init__(self, *args):
@@ -28,7 +34,9 @@ class Room_User:
         self.args = args
 
     def __str__(self):
-        return str(self.args)
+        return f'id:{self.id}\nroom_id:{self.room_id}\nuser_id:{self.user_id}\nnickname:{self.nickname}'
+
+    items = ['id,' 'room_id,' 'user_id,' 'nickname,']
 
 class User:
     def __init__(self, *args):
@@ -36,4 +44,8 @@ class User:
         self.args = args
 
     def __str__(self):
-        return str(self.args)
+        return f'id:{self.id}\npic:{self.pic}\nusername:{self.username}\npassword:{self.password}'
+
+    items = ['id,' 'pic,' 'username,' 'password,']
+
+table_dict = {'permission': Permission, 'point': Point, 'room': Room, 'room_user': Room_User, 'user': User}
