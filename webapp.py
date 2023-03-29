@@ -26,14 +26,25 @@ def logged_in():
     else:
         return False
 
+def login_required(endpoint_name):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            if logged_in():
+                return func(*args, **kwargs)
+            else:
+                return redirect(url_for('login'))
+        wrapper.__name__ = func.__name__
+        app.add_url_rule(endpoint_name, view_func=wrapper)
+        return wrapper
+    return decorator
+
 @app.route("/", methods = ['POST', 'GET'])
 def index():
     return redirect(url_for("rooms"))
 
 @app.route("/update_profile/", methods = ['POST', 'GET'])
+@login_required("/update_profile/")
 def update_profile():
-    if (not logged_in()):
-        return redirect(url_for("login"))
     user = get_user()
     data = dict(request.form)
     cur = sql(f"SELECT * FROM user WHERE username = \"{data['username']}\"")
@@ -83,17 +94,14 @@ window.addEventListener("DOMContentLoaded", () => {
     return S
 
 @app.route("/profile/", methods = ['POST', 'GET'])
+@login_required("/profile/")
 def profile():
-    if(not logged_in()):
-        return redirect(url_for("login"))
     user = get_user()
     return render_template("profile.html", user=user)
 
 @app.route("/manage/<room>", methods = ['POST', 'GET'])
+@login_required("/manage/<room>")
 def manage(room):
-    if(not logged_in()):
-        return redirect(url_for("login"))
-
     cur = sql(f"SELECT * FROM room WHERE id = {room}")
     room = Room(*cur[0])
 
@@ -115,9 +123,8 @@ def manage(room):
     return render_template("manage.html", permissions=permissions, room=room, owner=owner, user=get_user())
 
 @app.route("/ownership/<room>/<uid>", methods = ['POST', 'GET'])
+@login_required("/ownership/<room>/<uid>")
 def ownership(room, uid):
-    if (not logged_in()):
-        return redirect(url_for("login"))
     user = get_user()
     cur = sql(f"SELECT * FROM Permission WHERE room_id = {room} AND user_id = {user.id}")
     permission = Permission(*cur[0])
@@ -129,9 +136,8 @@ def ownership(room, uid):
     return redirect(url_for("rooms"))
 
 @app.route("/update/<room>", methods = ['POST', 'GET'])
+@login_required("/update/<room>")
 def update(room):
-    if (not logged_in()):
-        return redirect(url_for("login"))
     user = get_user()
     cur = sql(f"SELECT * FROM Permission WHERE room_id = {room} AND user_id = {user.id}")
     permission = Permission(*cur[0])
@@ -169,10 +175,8 @@ def update(room):
     return redirect(url_for("rooms"))
 
 @app.route("/leaderboard/<room>", methods = ['POST', 'GET'])
+@login_required("/leaderboard/<room>")
 def leaderboard(room):
-    if(not logged_in()):
-        return redirect(url_for("login"))
-
     cur = sql(f"SELECT [Room-User].id, [Room-User].room_id, [Room-User].user_id, nickname FROM [Room-User], Permission WHERE Permission.room_id = [Room-User].room_id AND Permission.permission_level = 5 AND Permission.room_id = {room}")
     owner = Room_User(*cur[0])
 
@@ -189,9 +193,8 @@ def leaderboard(room):
     return render_template("leaderboard.html", ranks=ranks, room=room, owner=owner)
 
 @app.route("/create_room", methods = ['POST', 'GET'])
+@login_required("/create_room")
 def create_room():
-    if(not logged_in()):
-        return redirect(url_for("login"))
     user = get_user()
 
     sql(f"INSERT INTO Room (name) VALUES (NULL)")
@@ -210,9 +213,8 @@ def create_room():
     return redirect(url_for("rooms"))
 
 @app.route("/join", methods = ['POST', 'GET'])
+@login_required("/join")
 def join():
-    if(not logged_in()):
-        return redirect(url_for("login"))
     user = get_user()
     data = dict(request.form)
     if("room_id" in data == False):
@@ -233,9 +235,8 @@ def join():
     return redirect(url_for("rooms"))
 
 @app.route("/room/<room>", methods = ['POST', 'GET'])
+@login_required("/room/<room>")
 def room(room):
-    if(not logged_in()):
-        return redirect(url_for("login"))
     user = get_user()
 
     cur = sql(f"SELECT * FROM room WHERE id = {room}")
@@ -253,9 +254,8 @@ def room(room):
     return render_template("room.html", owner=owner, room=room, user=user, room_user=room_user, point=point)
 
 @app.route("/rooms", methods = ['POST', 'GET'])
+@login_required("/rooms")
 def rooms():
-    if(not logged_in()):
-        return redirect(url_for("login"))
     uid = request.cookies.get('uid')
     cur = sql(f"SELECT room.id, room.description, room.name FROM room, [Room-User] WHERE room.id = [Room-User].room_id AND [Room-User].user_id = {uid}")
     for i in range(len(cur)):
