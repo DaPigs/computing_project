@@ -102,6 +102,7 @@ def profile():
 @app.route("/manage/<room>", methods = ['POST', 'GET'])
 @login_required("/manage/<room>")
 def manage(room):
+    user = get_user()
     cur = sql(f"SELECT * FROM room WHERE id = {room}")
     room = Room(*cur[0])
 
@@ -109,7 +110,6 @@ def manage(room):
     owner = Room_User(*cur[0])
 
     cur = sql(f"SELECT [room-user].id, [room-user].room_id, [room-user].user_id, [room-user].nickname, Permission.permission_level, SUM(point.point) FROM [room-user], Permission, Point WHERE Permission.room_id = {room.id} AND [room-user].room_id = {room.id} AND Permission.user_id = [room-user].user_id AND point.id = [room-user].id GROUP BY point.id ORDER BY Permission.permission_level DESC")
-
     permissions = []
     for i in cur:
         permissions.append({
@@ -120,7 +120,10 @@ def manage(room):
             "permission_level": i[4],
             "points": i[5]
         })
-    return render_template("manage.html", permissions=permissions, room=room, owner=owner, user=get_user())
+
+    cur = sql(f"SELECT nickname FROM [room-user] WHERE room_id = {room.id} AND user_id = {user.id}")
+    nickname = cur[0][0]
+    return render_template("manage.html", permissions=permissions, room=room, owner=owner, user=user, nickname=nickname)
 
 @app.route("/ownership/<room>/<uid>", methods = ['POST', 'GET'])
 @login_required("/ownership/<room>/<uid>")
@@ -172,7 +175,7 @@ def update(room):
                 if(len(cur)):
                     room_user = Room_User(*cur[0])
                     sql(f"INSERT INTO point (id, point) VALUES ({room_user.id}, {value})")
-    return redirect(url_for("rooms"))
+    return redirect(url_for("room", room=5))
 
 @app.route("/leaderboard/<room>", methods = ['POST', 'GET'])
 @login_required("/leaderboard/<room>")
@@ -223,7 +226,7 @@ def join():
     cur = sql(f"SELECT * FROM room WHERE id = {data['room_id']}")
     room = Room(*cur[0])
 
-    sql(f"INSERT INTO [room-user] (room_id, user_id, nickname) VALUES ({room.id}, {user.id}, {user.username})")
+    sql(f"INSERT INTO [room-user] (room_id, user_id, nickname) VALUES ({room.id}, {user.id}, '{user.username}')")
 
     cur = sql(f"SELECT * FROM [room-user] WHERE room_id = {room.id} AND user_id = {user.id}")
     room_user = Room_User(*cur[0])
@@ -306,13 +309,14 @@ def header():
     user = get_user()
     return render_template("header.html", user=user)
 
-@app.errorhandler(Exception)
-def all_exception_handler(error):
-   return send_file("not_found.html")
+# @app.errorhandler(Exception)
+# def all_exception_handler(error):
+#    return send_file("not_found.html")
 
-# @app.route('/', defaults={'path': ''})
-# @app.route('/<path:path>')
-# def catch_all(path):
-#     return send_file(path)
+@app.route('/', defaults={'path': ''})
+
+@app.route('/<path:path>')
+def catch_all(path):
+    return send_file(path)
 if(__name__ == "__main__"):
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=8080, debug=True)
